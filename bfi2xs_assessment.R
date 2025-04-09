@@ -18,13 +18,18 @@ pacman::p_load(dplyr, car, psych, stargazer, readr)
 # Define these at the beginning to make the script more configurable
 MIN_PROGRESS_THRESHOLD <- 80  # Minimum completion percentage to include a response
 LIKERT_SCALE_MAX <- 5         # Maximum value in the Likert scale (typically 5)
-OUTPUT_FILENAME <- "bfi2xs_results.csv"
+OUTPUT_FILENAME <- "data/bfi2xs_results.csv"  # Store results in the data folder
 
 # --------------------------------
 # 3. Data Loading and Preprocessing
 # --------------------------------
 
 load_bfi_data <- function(numeric_file, categorical_file = NULL, separator = ";") {
+  # Check if file path includes "data/" prefix, add it if not
+  if (!grepl("^data/", numeric_file)) {
+    numeric_file <- file.path("data", numeric_file)
+  }
+  
   # Load numeric data
   tryCatch({
     bfi_numeric <- read.csv(numeric_file,
@@ -43,6 +48,11 @@ load_bfi_data <- function(numeric_file, categorical_file = NULL, separator = ";"
     
     # Load categorical data if provided
     if (!is.null(categorical_file)) {
+      # Add data/ prefix if missing
+      if (!grepl("^data/", categorical_file)) {
+        categorical_file <- file.path("data", categorical_file)
+      }
+      
       bfi_categorical <- read.csv(categorical_file,
                                 sep = separator,
                                 na.strings = "", 
@@ -100,7 +110,7 @@ extract_bfi_items <- function(bfi_data, item_names) {
 # - Negative Emotionality/Neuroticism (N): Being prone to anxiety, depression, and emotional volatility
 # - Open-Mindedness/Openness (O): Being intellectually curious, appreciative of art, and open to new ideas
 
-score_bfi2xs <- function(bfi_items) {
+score_bfi2xs <- function(bfi_items, spanish_version = TRUE) {
   # Define item indices for each trait dimension based on language version
   if (spanish_version) {
     # Spanish BFI-2-XS trait dimensions (from the SP-BFI-2-XS scoring instructions)
@@ -176,6 +186,26 @@ score_bfi2xs <- function(bfi_items) {
   
   return(results)
 }
+  
+  # Calculate dimension scores by summing items
+  agreeableness_score <- rowSums(agreeableness)
+  neuroticism_score <- rowSums(neuroticism)
+  conscientiousness_score <- rowSums(conscientiousness)
+  openness_score <- rowSums(openness)
+  extraversion_score <- rowSums(extraversion)
+  
+  # Combine original items and calculated scores
+  results <- cbind(
+    bfi_items,
+    Agreeableness = agreeableness_score,
+    Neuroticism = neuroticism_score,
+    Conscientiousness = conscientiousness_score,
+    Openness = openness_score,
+    Extraversion = extraversion_score
+  )
+  
+  return(results)
+}
 
 # --------------------------------
 # 6. Correlation Analysis
@@ -187,7 +217,10 @@ analyze_correlations <- function(bfi_results, plot = TRUE, export_html = FALSE) 
   
   # Create visualization if requested
   if (plot) {
+    pdf("data/bfi2xs_correlations.pdf")
     psych::cor.plot(cor_matrix, main = "BFI-2-XS Item Correlations")
+    dev.off()
+    message("Correlation plot saved to 'data/bfi2xs_correlations.pdf'")
   }
   
   # Export to HTML if requested
@@ -201,9 +234,9 @@ analyze_correlations <- function(bfi_results, plot = TRUE, export_html = FALSE) 
               type = 'html', 
               initial.zero = FALSE, 
               digits = 2,
-              out = "bfi2xs_correlations.html")
+              out = "data/bfi2xs_correlations.html")
     
-    message("Correlation matrix exported to 'bfi2xs_correlations.html'")
+    message("Correlation matrix exported to 'data/bfi2xs_correlations.html'")
   }
   
   return(cor_matrix)
@@ -239,8 +272,8 @@ run_bfi2xs_analysis <- function(numeric_file,
   # Extract BFI items
   bfi_items <- extract_bfi_items(bfi_data, item_names)
   
-  # Score the BFI-2-XS
-  results <- score_bfi2xs(bfi_items)
+  # Score the BFI-2-XS (pass spanish_version parameter to scoring function)
+  results <- score_bfi2xs(bfi_items, spanish_version)
   
   # Analyze correlations if requested
   if (analyze_cors) {
