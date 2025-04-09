@@ -7,7 +7,7 @@ A reliable and easy-to-use R package for calculating and analyzing personality s
 
 ## 📋 Table of Contents
 
-- [Overview]([#overview])
+- [Overview](#overview)
 - [The Big Five Personality Traits](#the-big-five-personality-traits)
 - [Installation](#installation)
 - [Usage](#usage)
