@@ -24,7 +24,7 @@ OUTPUT_FILENAME <- "data/bfi2xs_results.csv"  # Store results in the data folder
 # 3. Data Loading and Preprocessing
 # --------------------------------
 
-load_bfi_data <- function(numeric_file, categorical_file = NULL, separator = ";") {
+load_bfi_data <- function(numeric_file, categorical_file = NULL, separator = ",") {
   # Check if file path includes "data/" prefix, add it if not
   if (!grepl("^data/", numeric_file)) {
     numeric_file <- file.path("data", numeric_file)
@@ -38,12 +38,12 @@ load_bfi_data <- function(numeric_file, categorical_file = NULL, separator = ";"
                           header = TRUE,
                           check.names = FALSE)
     
-    # Filter out incomplete responses
+    # Filter out incomplete responses if Progress column exists
     if ("Progress" %in% colnames(bfi_numeric)) {
       bfi_numeric <- subset(bfi_numeric, Progress >= MIN_PROGRESS_THRESHOLD)
       message(paste("Filtered numeric data to", nrow(bfi_numeric), "complete responses"))
     } else {
-      warning("No 'Progress' column found in numeric data. No filtering applied.")
+      message("No 'Progress' column found in numeric data. Using all responses.")
     }
     
     # Load categorical data if provided
@@ -59,12 +59,12 @@ load_bfi_data <- function(numeric_file, categorical_file = NULL, separator = ";"
                                 header = TRUE,
                                 check.names = FALSE)
       
-      # Filter out incomplete responses
+      # Filter out incomplete responses if Progress column exists
       if ("Progress" %in% colnames(bfi_categorical)) {
         bfi_categorical <- subset(bfi_categorical, Progress >= MIN_PROGRESS_THRESHOLD)
         message(paste("Filtered categorical data to", nrow(bfi_categorical), "complete responses"))
       } else {
-        warning("No 'Progress' column found in categorical data. No filtering applied.")
+        message("No 'Progress' column found in categorical data. Using all responses.")
       }
       
       return(list(numeric = bfi_numeric, categorical = bfi_categorical))
@@ -137,6 +137,7 @@ score_bfi2xs <- function(bfi_items, spanish_version = TRUE) {
     
     # Openness: Item 2 (abstracto) is reverse-scored
     openness[, 2] <- LIKERT_SCALE_MAX + 1 - openness[, 2]
+    
   } else {
     # English BFI-2-XS trait dimensions (from the English BFI scoring instructions)
     extraversion_items <- c(1, 6, 11)  # talkative, reserved, energy
@@ -166,26 +167,6 @@ score_bfi2xs <- function(bfi_items, spanish_version = TRUE) {
     # Neuroticism: Item 2 (relaxed) is reverse-scored (lower = more neurotic)
     neuroticism[, 2] <- LIKERT_SCALE_MAX + 1 - neuroticism[, 2]
   }
-  
-  # Calculate dimension scores by summing items
-  agreeableness_score <- rowSums(agreeableness)
-  neuroticism_score <- rowSums(neuroticism)
-  conscientiousness_score <- rowSums(conscientiousness)
-  openness_score <- rowSums(openness)
-  extraversion_score <- rowSums(extraversion)
-  
-  # Combine original items and calculated scores
-  results <- cbind(
-    bfi_items,
-    Agreeableness = agreeableness_score,
-    Neuroticism = neuroticism_score,
-    Conscientiousness = conscientiousness_score,
-    Openness = openness_score,
-    Extraversion = extraversion_score
-  )
-  
-  return(results)
-}
   
   # Calculate dimension scores by summing items
   agreeableness_score <- rowSums(agreeableness)
@@ -294,7 +275,7 @@ run_bfi2xs_analysis <- function(numeric_file,
 # --------------------------------
 
 # Uncomment and modify the line below to run the analysis
-# results <- run_bfi2xs_analysis("BFI2XS_h.csv", "BFI2XS_solmnt_cat.csv")
+results <- run_bfi2xs_analysis("example_es.csv")
 
 # Print summary statistics
 # summary(results[, c("Agreeableness", "Neuroticism", "Conscientiousness", "Openness", "Extraversion")])

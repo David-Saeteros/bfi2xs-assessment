@@ -94,6 +94,12 @@ boxplot(results[, c("Agreeableness", "Neuroticism", "Conscientiousness", "Openne
 
 The tool accepts CSV files with the following format:
 
+### Required Columns
+
+Your CSV should contain these columns for the BFI-2-XS items based on the version you're using (Spanish or English). 
+
+**Optional**: If your data comes from Qualtrics or another survey platform that includes a `Progress` column, the tool can use it to filter out incomplete responses. If no `Progress` column is present, all responses will be used.
+
 ### For the Spanish version (SP-BFI-2-XS):
 
 Your CSV should contain these columns for the BFI-2-XS items:
@@ -209,6 +215,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📚 References
 
-- Gallardo-Pujol, D., Rouco, V., Cortijos-Bernabeu, A., Oceja, L., Soto, C. J., & John, O. P. (2022). Factor Structure, Gender Invariance, Measurement Properties, and Short Forms of the Spanish Adaptation of the Big Five Inventory-2. Psychological Test Adaptation and Development, 3(1), 44–69. https://doi.org/10.1027/2698-1866/a000020
 - Soto, C. J., & John, O. P. (2017). The next Big Five Inventory (BFI-2): Developing and assessing a hierarchical model with 15 facets to enhance bandwidth, fidelity, and predictive power. Journal of Personality and Social Psychology, 113(1), 117-143.
 - Soto, C. J., & John, O. P. (2017). Short and extra-short forms of the Big Five Inventory–2: The BFI-2-S and BFI-2-XS. Journal of Research in Personality, 68, 69-81.
