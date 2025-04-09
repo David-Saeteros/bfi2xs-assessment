@@ -3,7 +3,7 @@
 ![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)
 ![R Version](https://img.shields.io/badge/R-%3E%3D%204.0.0-brightgreen)
 
-A reliable and easy-to-use R package for calculating and analyzing personality scores using the Big Five Inventory-2-Extra Short Form (BFI-2-XS).
+A reliable and easy-to-use R script for calculating and analyzing personality scores using the Big Five Inventory-2-Extra Short Form (BFI-2-XS).
 
 ## 📋 Table of Contents
 
